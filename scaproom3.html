@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room - Mitos e Verdades sobre Alimentos</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('fundo.jpg'); /* Coloque o nome da sua imagem de fundo aqui */
+            background-size: cover;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .feedback {
+            display: none;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .retry {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Escape Room: Mitos e Verdades sobre Alimentos</h1>
+        <p id="question">Pergunta vai aqui</p>
+        <button id="verdade">Verdade</button>
+        <button id="mito">Mito</button>
+        <p id="score">Pontuação: 0/10</p>
+        <div class="feedback" id="feedback"></div>
+        <button class="retry" id="retry">Tentar Novamente</button>
+    </div>
+
+    <script>
+        // Perguntas e Respostas (Mitos e Verdades)
+        const perguntas = [
+            { pergunta: "Tomar água morna em jejum emagrece?", resposta: "mito" },
+            { pergunta: "Cenoura melhora a visão?", resposta: "verdade" },
+            { pergunta: "Beber leite corta o efeito de antibióticos?", resposta: "mito" },
+            { pergunta: "Ovo faz mal para o coração?", resposta: "mito" },
+            { pergunta: "Comer abacate ajuda a emagrecer?", resposta: "verdade" },
+            { pergunta: "Comer à noite engorda?", resposta: "mito" },
+            { pergunta: "Chocolate amargo é bom para o coração?", resposta: "verdade" },
+            { pergunta: "Pular o café da manhã ajuda a emagrecer?", resposta: "mito" },
+            { pergunta: "Comer peixe melhora a memória?", resposta: "verdade" },
+            { pergunta: "Tomar suco de laranja à noite faz mal?", resposta: "mito" }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let errors = 0;
+
+        // Sons
+        const correctSound = new Audio('correct.mp3'); // Som ao acertar
+        const wrongSound = new Audio('wrong.mp3'); // Som ao errar
+
+        const questionElement = document.getElementById('question');
+        const scoreElement = document.getElementById('score');
+        const feedbackElement = document.getElementById('feedback');
+        const retryButton = document.getElementById('retry');
+
+        // Mostrar a pergunta
+        function showQuestion() {
+            if (currentQuestion < perguntas.length) {
+                questionElement.textContent = perguntas[currentQuestion].pergunta;
+            } else {
+                endGame();
+            }
+        }
+
+        // Verificar resposta
+        function checkAnswer(answer) {
+            if (answer === perguntas[currentQuestion].resposta) {
+                correctSound.play();
+                score++;
+            } else {
+                wrongSound.play();
+                errors++;
+            }
+
+            currentQuestion++;
+            scoreElement.textContent = `Pontuação: ${score}/${perguntas.length}`;
+            showQuestion();
+        }
+
+        // Fim do jogo
+        function endGame() {
+            const totalQuestions = perguntas.length;
+            const errorRate = (errors / totalQuestions) * 100;
+
+            if (score === totalQuestions) {
+                feedbackElement.textContent = "Parabéns! Você acertou tudo e escapou!";
+            } else if (errorRate > 70) {
+                feedbackElement.textContent = "Você errou mais que 70% e... morreu!";
+            } else {
+                feedbackElement.textContent = `Você acertou ${score} de ${totalQuestions} perguntas. Tente novamente para escapar!`;
+            }
+
+            feedbackElement.style.display = 'block';
+            document.getElementById('verdade').disabled = true;
+            document.getElementById('mito').disabled = true;
+            retryButton.style.display = 'block';
+        }
+
+        // Reiniciar o jogo
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            errors = 0;
+            feedbackElement.style.display = 'none';
+            retryButton.style.display = 'none';
+            document.getElementById('verdade').disabled = false;
+            document.getElementById('mito').disabled = false;
+            scoreElement.textContent = `Pontuação: ${score}/${perguntas.length}`;
+            showQuestion();
+        }
+
+        // Eventos dos botões
+        document.getElementById('verdade').addEventListener('click', function() {
+            checkAnswer('verdade');
+        });
+
+        document.getElementById('mito').addEventListener('click', function() {
+            checkAnswer('mito');
+        });
+
+        retryButton.addEventListener('click', restartGame);
+
+        // Iniciar o jogo
+        showQuestion();
+    </script>
+
+</body>
+</html>
